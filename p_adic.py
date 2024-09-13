@@ -68,7 +68,7 @@ Returns a readable version of the p-adic number after simplification.
         return highest_power_of_p(num) - highest_power_of_p(denom)
 
     @staticmethod
-    def to_p_adic(p, num, denom=1):
+    def to_p_adic(p, num: int, denom: int = 1):
         """
 Converts a given rational number to a p-adic.
         :param p: Must be a prime number
@@ -76,6 +76,9 @@ Converts a given rational number to a p-adic.
         :param denom: Must be a non-zero integer
         :return: pAdic number
         """
+        assert denom != 0
+        if num == 0:
+            return pAdic.zero(p)
         available_digits = list(range(p))
         n_0 = pAdic.p_adic_valuation(num, denom, p)
 
@@ -157,13 +160,14 @@ Converts a given rational number to a p-adic.
         b //= g
         return a, b
 
-
     def __add__(self, other):
         """
 Adds together two p-adic numbers, for the same p.
         :param other: p-adic number
         :return: p-adic number
         """
+        if isinstance(other, int):
+            other = pAdic.to_p_adic(self.p, other)
         assert isinstance(other, pAdic)
         # Cannot add incompatible p-adic numbers
         if self.p != other.p:
@@ -263,6 +267,18 @@ Simplifies a p-adic number to remove trailing zeroes, repetition in the periodic
 
     def __sub__(self, other):
         return self + (- other)
+
+    def __mul__(self, other):
+        """
+        Multiplies if rational. If this is extended into the irrationals this will need a total rewrite.
+        :param other:
+        :return: self * other
+        """
+        assert isinstance(other, pAdic)
+        assert other.p == self.p
+        a, b = self.to_rational()
+        c, d = other.to_rational()
+        return pAdic.to_p_adic(self.p, a * c, b * d)
 
     def __lshift__(self, other):
         """
