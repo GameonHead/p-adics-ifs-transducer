@@ -1,3 +1,5 @@
+from idlelib.pyparse import trans
+
 import p_adic as pa
 import p_adic_IFS as pIFS
 import transducer_viewer as tv
@@ -39,9 +41,19 @@ with open('functions.txt', 'r+t') as f:
     transducer: pIFS.Transducer = pIFS.Transducer(p, (pa.pAdic.zero(p), 1), *function_list)
 
     # Line 2 decides what to do:
-    if lines[1].strip() == 'DFS':
+    if lines[1].strip().upper() == 'DFS':
         print(tv.make_dfa(transducer).to_graphviz())
-    elif lines[1].strip() == 'NDFS':
+    elif lines[1].strip().upper() == 'NDFS':
         tv.make_ndfa(transducer)
+    elif lines[1].strip().upper() == 'A':
+        print(tv.make_dfa(transducer).adjacency_matrix())
+    elif lines[1].strip().upper() == 'DIMENSION':
+        print(tv.hausdorff_dimension(transducer))
+    elif lines[1].strip().upper() == 'SIMPLIFY':
+        simple_t = transducer.simplify()
+        print(simple_t.functions)
+        print(f'Hausdorff Dimension: {tv.hausdorff_dimension(simple_t)}')
+        print(f'DFS:')
+        print(tv.make_dfa(simple_t).to_graphviz())
     else:
         print(tv.view_transducer(transducer))

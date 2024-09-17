@@ -2,6 +2,7 @@ import logging
 from graphviz import Digraph
 import p_adic_IFS as pIFS
 import p_adic as pa
+import numpy as np
 
 
 class MyGraph:
@@ -31,6 +32,17 @@ class MyGraph:
         del self.graph[node]
         for u in self.graph:
             self.graph[u] = [(a, b) for a, b in self.graph[u] if b != node]
+
+    def edge_count(self, tail, head):
+        if tail in self.graph:
+            return [a[1] == head for a in self.graph[tail]].count(True)
+        return 0
+
+    def adjacency_matrix(self):
+        ordering = list(self.graph.keys())
+        matrix = [[self.edge_count(t,h) for h in ordering] for t in ordering]
+        return np.array(matrix)
+
 
 def node_name(node: pIFS.State) -> str:
     num, denom = node[0].to_rational()
@@ -126,3 +138,8 @@ def make_dfa(transducer: pIFS.Transducer):
         traversed_states.append(cur_state)
         unexplored_states = unexplored_states[1:]
     return dfa
+
+def hausdorff_dimension(transducer: pIFS.Transducer):
+    adjacency_matrix = make_dfa(transducer).adjacency_matrix()
+    spectral_radius = max(map(np.abs, np.linalg.eig(adjacency_matrix)[0]))
+    return np.log(spectral_radius)/np.log(transducer.p)
