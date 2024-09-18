@@ -41,9 +41,9 @@ with open('functions.txt', 'r+t') as f:
     transducer: pIFS.Transducer = pIFS.Transducer(p, (pa.pAdic.zero(p), 1), *function_list)
 
     # Line 2 decides what to do:
-    if lines[1].strip().upper() == 'DFS':
+    if lines[1].strip().upper() == 'DFA':
         print(tv.make_dfa(transducer).to_graphviz())
-    elif lines[1].strip().upper() == 'NDFS':
+    elif lines[1].strip().upper() == 'NDFA':
         tv.make_ndfa(transducer)
     elif lines[1].strip().upper() == 'A':
         print(tv.make_dfa(transducer).adjacency_matrix())
@@ -53,7 +53,7 @@ with open('functions.txt', 'r+t') as f:
         simple_t = transducer.simplify()
         print(simple_t.functions)
         print(f'Hausdorff Dimension: {tv.hausdorff_dimension(simple_t)}')
-        print(f'DFS:')
+        print(f'DFA:')
         print(tv.make_dfa(simple_t).to_graphviz())
     else:
         print(tv.view_transducer(transducer))

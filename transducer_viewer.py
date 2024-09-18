@@ -73,7 +73,7 @@ def ndfa_arcs(g: Digraph, tail: str, head: str, o: pIFS.Result, counter: int, q:
         counter += 1
     g.edge(prev, head, label=str(output[-1]))
     if q is not None:
-        q.add_edge(prev, head, str(i))
+        q.add_edge(prev, head, str(output[-1]))
     return counter
 
 
