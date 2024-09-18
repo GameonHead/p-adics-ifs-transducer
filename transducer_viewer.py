@@ -75,7 +75,7 @@ def ndfa_arcs(g: Digraph, tail: str, head: str, o: pIFS.Result | cpIFS.Result, c
         counter += 1
     g.edge(prev, head, label=str(output[-1]))
     if q is not None:
-        q.add_edge(prev, head, str(i))
+        q.add_edge(prev, head, str(output[-1]))
     return counter
 
 
@@ -145,10 +145,3 @@ def hausdorff_dimension(transducer: pIFS.Transducer | cpIFS.Transducer):
     adjacency_matrix = make_dfa(transducer).adjacency_matrix()
     spectral_radius = max(map(np.abs, np.linalg.eig(adjacency_matrix)[0]))
     return np.log(spectral_radius)/np.log(transducer.p)
-
-# a = cpIFS.Complex_pAdicFunction(3, 'A', cpa.Complex_pAdic.to_p_adic(3, 2 + 1j, 1 + 3j))
-# b = cpIFS.Complex_pAdicFunction(3, 'B', cpa.Complex_pAdic.to_p_adic(3, 1 + 2j), 1, 3)
-# t = cpIFS.Transducer(3, (cpa.Complex_pAdic.zero(3), 0), a, b)
-# # print(view_transducer(t))
-# print(make_dfa(t).to_graphviz())
-# print(hausdorff_dimension(t))

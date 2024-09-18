@@ -11,7 +11,7 @@ class Complex_pAdic:
         self.re = real
         self.im = imaginary
 
-    def to_rational(self) -> (complex, int):
+    def to_rational(self) -> tuple[complex, int]:
         ra, rb = self.re.to_rational()
         ia, ib = self.im.to_rational()
         g = lcm(rb, ib)

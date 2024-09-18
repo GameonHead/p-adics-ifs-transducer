@@ -42,7 +42,10 @@ class Transducer:
         f_tuples = [(f.d.to_rational(), f.epsilon, f.k, f.name) for f in self.functions]
         z, d = f_tuples[0][0]
         denom = lcm(*(rational[1] for rational, _, _, _ in f_tuples))
-
+        f_tuples = [((rational[0] * (denom//rational[1]), 1), epsilon, k, name + "'") for rational, epsilon, k, name in f_tuples]
+        return Transducer(self.p, self.i, *(
+        Complex_pAdicFunction(self.p, f[3], cpa.Complex_pAdic.to_p_adic(self.p, *f[0]) - cpa.Complex_pAdic.to_p_adic(self.p, *f_tuples[0][0]), f[2], f[1]) for f in
+        f_tuples))
 
     def shift(self, x: cpa.Complex_pAdic, shift_count: int = 1) -> tuple[cpa.Complex_pAdic, tuple]:
         d = tuple(x[i] for i in range(shift_count))
