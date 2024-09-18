@@ -1,7 +1,9 @@
 import logging
 from graphviz import Digraph
 import p_adic_IFS as pIFS
+import complex_p_adic_IFS as cpIFS
 import p_adic as pa
+import complex_padic as cpa
 import numpy as np
 
 
@@ -44,17 +46,17 @@ class MyGraph:
         return np.array(matrix)
 
 
-def node_name(node: pIFS.State) -> str:
+def node_name(node: pIFS.State | cpIFS.State) -> str:
     num, denom = node[0].to_rational()
     return f"({num}{f'/{denom}' if denom != 1 else ''}, {node[1]})"
 
 
-def arc_label(f: pIFS.pAdicFunction, o: pIFS.Result) -> str:
+def arc_label(f: pIFS.pAdicFunction | cpIFS.Complex_pAdicFunction, o: pIFS.Result) -> str:
     display = f.name if f.name != '' else f.__repr__()
     output = ','.join(map(str, o[1]))
     return f'{display}/{output}'
 
-def ndfa_arcs(g: Digraph, tail: str, head: str, o: pIFS.Result, counter: int, q: MyGraph | None = None) -> int:
+def ndfa_arcs(g: Digraph, tail: str, head: str, o: pIFS.Result | cpIFS.Result, counter: int, q: MyGraph | None = None) -> int:
     output = o[1]
     if len(output) == 1:
         g.edge(tail, head, label=str(output[0]))
@@ -77,7 +79,7 @@ def ndfa_arcs(g: Digraph, tail: str, head: str, o: pIFS.Result, counter: int, q:
     return counter
 
 
-def view_transducer(transducer: pIFS.Transducer):
+def view_transducer(transducer: pIFS.Transducer | cpIFS.Transducer):
     transducer.create_transducer()
     graph = Digraph()
     for i in transducer.nodes:
@@ -87,7 +89,7 @@ def view_transducer(transducer: pIFS.Transducer):
             graph.edge(node_name(tail), node_name(result[0]), label=arc_label(f, result))
     return graph
 
-def make_ndfa(transducer: pIFS.Transducer, suppress_output=False) -> MyGraph:
+def make_ndfa(transducer: pIFS.Transducer | cpIFS.Transducer, suppress_output=False) -> MyGraph:
     counter = 0
     g = MyGraph()
     transducer.create_transducer()
@@ -103,7 +105,7 @@ def make_ndfa(transducer: pIFS.Transducer, suppress_output=False) -> MyGraph:
         print(graph.source)
     return g
 
-def make_dfa(transducer: pIFS.Transducer):
+def make_dfa(transducer: pIFS.Transducer | cpIFS.Transducer):
     inputs = list(map(str, range(transducer.p)))
     unexplored_states: list[set[str]] = []
     traversed_states: list[set[str]] = []
@@ -139,7 +141,14 @@ def make_dfa(transducer: pIFS.Transducer):
         unexplored_states = unexplored_states[1:]
     return dfa
 
-def hausdorff_dimension(transducer: pIFS.Transducer):
+def hausdorff_dimension(transducer: pIFS.Transducer | cpIFS.Transducer):
     adjacency_matrix = make_dfa(transducer).adjacency_matrix()
     spectral_radius = max(map(np.abs, np.linalg.eig(adjacency_matrix)[0]))
     return np.log(spectral_radius)/np.log(transducer.p)
+
+# a = cpIFS.Complex_pAdicFunction(3, 'A', cpa.Complex_pAdic.to_p_adic(3, 2 + 1j, 1 + 3j))
+# b = cpIFS.Complex_pAdicFunction(3, 'B', cpa.Complex_pAdic.to_p_adic(3, 1 + 2j), 1, 3)
+# t = cpIFS.Transducer(3, (cpa.Complex_pAdic.zero(3), 0), a, b)
+# # print(view_transducer(t))
+# print(make_dfa(t).to_graphviz())
+# print(hausdorff_dimension(t))

@@ -1,5 +1,3 @@
-from idlelib.pyparse import trans
-
 import p_adic as pa
 import p_adic_IFS as pIFS
 import transducer_viewer as tv
